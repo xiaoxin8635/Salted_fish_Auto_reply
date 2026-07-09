@@ -124,6 +124,9 @@ class AccountRuntime:
             live = self._live_factory(self._cookies)
             self._live = live
             live.set_message_handler(self._message_handler)
+            # 即将进入消息循环:连接已成功建立,重置连续失败计数
+            # (避免稳定账号因偶发断线累积到 max_attempts 被误判 FATAL)
+            self._attempt = 0
             await self._set_state(AccountStatus.ONLINE)
             await live.main()
             # main 正常返回:视作断线或主动停止
